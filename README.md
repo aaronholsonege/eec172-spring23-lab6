@@ -179,7 +179,21 @@ Instead, we calculate the deltas - the area the paddle is no longer in is erased
 
 ### Game States
 
-The game progresses through various states, such as countdown, gameplay, and game over.
+#### Main Menu
+The MainMenu state is the initial state of the game that will render the main menu on the OLED allowing a player to select a singpleplayer game or multiplayer game. The state will check the values of the joystick SW and the X position value. If the player moves the joystick up the OLED will update highlighting the current selection. Once a player presses down on the joystick the screen will begin to transition to the next state. 
+####  Singleplayer
+If a player selected the singleplayer option it will then initialize the game and render it on the OLED. The state switch to the playing state when finished
+####  Multiplayer
+When a player selects the multiplayer option from the main menu the game will initialize for multiplayer. The state switch to the playing state when finished
+#### Playing
+Once the game has been initialized this state will be used to continues run the game logic depending on what is has been initiazled to. It will check the joystick SW value to see if a player has pressed. If the button is pressed it will transition to the paused state.
+#### Paused
+When a player pause the game it will stop updating the game logic and display the pause menu allowing the player to select resume or quit.
+####  Finished
+When a game is finished this will be display a menu on the OLED allowing the player to return to main menu.
+
+![State Diagram](state-diagram.png)
+*Figure 14: State Diagram
 
 ## References
 
