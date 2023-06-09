@@ -7,7 +7,7 @@ This project demonstrates an online Pong game that allows players to compete aga
 
 ## Demo Video
 [![Demo](https://i.ytimg.com/vi/7d6nEgtiEZs/maxresdefault.jpg)](https://youtu.be/7d6nEgtiEZs "Demo")
-![Schematic](EEC-172-Lab-6-Schematic.png)
+![Schematic](EEC-172-Lab-6-Schematic2.png)
 ## Methods
 
 
