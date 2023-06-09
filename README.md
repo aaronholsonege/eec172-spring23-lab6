@@ -47,17 +47,21 @@ One reason we chose NodeJS over other languages was due to the stateful nature o
 
 The main duties of the server include passing gameplay data between the two players (Figure 5), and managing the game state.
 
-![](server-client%20flow.drawio.png)
+![](server-client-flow-1.png)
 
 *Figure 5: Data flow when P1 syncs positional data to P2*
 
-*Figure 6: Data flow when P1 syncs positional data to P2 that also triggers the server to update game state data & positional data*
-
-*Figure 7: Data flow when server syncs state & (reset) positional data to P1 & P2*
-
 The server will peek at data being transferred between boards and emits game state changes based on specific events in that data (Figure 6).
 
+![](server-client-flow-2.png)
+
+*Figure 6: Data flow when P1 syncs positional data to P2 that also triggers the server to update game state data & positional data*
+
 The other important duty of the server is to facilitate the round countdown, which it manages and sends to each board (Figure 7).
+
+![](server-client-flow-3.png)
+
+*Figure 7: Data flow when server syncs state & (reset) positional data to P1 & P2*
 
 To reduce the amount of data being sent to each board, the server buffers payloads so it can be combined and deduped. We only buffer for 1 tick of the processor before releasing the payload. This allows the server to more freely update the game state multiple times based on subsets of gameplay data without needing to know what events and data have already or are going to be sent. When the buffer is flushed, then everything is merged, deduped, and sent as one message.
 
@@ -131,15 +135,17 @@ When one board sends the position/directional data for their paddle or ball, the
 
 This latency (and need for real time data) causes a few problems. First, applying the received positional data “as-is” caused the ball/paddle to jump around on the screen.
 
-![](sync.drawio.png)
+![](sync-1.png)
 
 *Figure 11: Ball location synchronization without projection*
-
-*Figure 11: Ball location synchronization with projection*
 
 The larger issue caused by this stale data is that as each player repositions their ball and paddle based on past information as the round plays, the boards become more and more out of sync.
 
 To mitigate this, we needed a way to identify a payload with a specific point in game time. Since the boards do not have an accurate time applied to them (and there wasn’t a simple sure-first way to ensure they truly agreed on the current time), we couldn’t rely on timestamps. Instead, since both boards are operating at the same FPS, we can count frames at the start of every round and provide the frame number with the ball or paddle data. When a board receives positional data, they will also receive the frame number that positional data applies to. The board then compares it to its own current frame number, and projects the provided positional data back into the current frame.
+
+![](sync-2.png)
+
+*Figure 11: Ball location synchronization with projection*
 
 In a further effort to ensure smooth gameplay, each board assumes the opponent player blocks the ball unless it receives a payload that either confirms this, or a new round is started. This means most of the time when we receive stale position data and project it into the current frame, the location of the ball is at the same location.
 
@@ -159,11 +165,17 @@ Re-rendering is also a process in itself. Using the previous location data, we u
 For the paddle, it was actually fairly slow to completely erase the entire paddle and redraw it (see Figure 12).
 
 
-![Optimized paddle rendering by erasing/drawing delta](paddle-draw.drawio.png)
+![Optimized paddle rendering by erasing/drawing delta](draw-paddle-1.png)
+
+*Figure 12: Paddle rendering*
+
+Instead, we calculate the deltas - the area the paddle is no longer in is erased and the new area the paddle is in is drawn resulting is a much faster re-render (see Figure 13).
+
+
+![Optimized paddle rendering by erasing/drawing delta](draw-paddle-2.png)
 
 *Figure 13: Optimized paddle rendering by erasing/drawing delta*
 
-Instead, we calculate the deltas - the area the paddle is no longer in is erased and the new area the paddle is in is drawn resulting is a much faster re-render (see Figure 13).
 
 ### Game States
 
