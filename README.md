@@ -193,7 +193,7 @@ When a player pause the game it will stop updating the game logic and display th
 When a game is finished this will be display a menu on the OLED allowing the player to return to main menu.
 
 ![State Diagram](state-diagram.png)
-*Figure 14: State Diagram
+*Figure 14: State Diagram*
 
 ## References
 
